@@ -1,181 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>INTERN PROJECT STATUS CHECKER</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GPI Student Project Status Checker</title>
   <style>
+    * { box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
-      background: #fff7f1;
-      margin: 0;
-      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+      padding: 10px;
+      text-align: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
-
-    .header-logos {
+    .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      flex-wrap: wrap;
     }
-
-    .header-logos img {
-      width: 100px;
-      height: auto;
+    .logo {
+      height: 50px;
+      max-width: 40%;
+      margin: 5px;
     }
-
     .iac-logo {
-      display: flex;
-      justify-content: center;
-      margin: 10px 0 0 0;
+      height: 40px;
+      margin: 10px 0;
     }
-
-    .iac-logo img {
-      width: 120px;
-      height: auto;
-    }
-
-    .title {
-      text-align: center;
-      font-size: 40px;
+    h1 {
+      font-size: 1.5rem;
       font-weight: bold;
-      margin: 10px 0 20px 0;
+      margin: 10px 0;
     }
-
-    .container {
-      max-width: 700px;
-      margin: auto;
-      background: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      position: relative;
-      z-index: 1;
+    input[type="text"] {
+      width: 90%;
+      max-width: 350px;
+      padding: 10px;
+      font-size: 1rem;
+      margin: 10px 0;
     }
-
-    .instructions {
-      text-align: left;
-      background: #e9f5ff;
-      padding: 15px;
-      border-left: 5px solid #007acc;
-      margin-bottom: 20px;
-      border-radius: 6px;
-    }
-
-    input, button {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      margin-top: 10px;
-    }
-
     button {
-      background-color: #EA7317;
+      padding: 10px 15px;
+      background-color: #f4a261;
       color: white;
       border: none;
+      border-radius: 5px;
+      font-size: 1rem;
       cursor: pointer;
+      margin: 5px;
     }
-
     button:hover {
-      background-color: #c85c07#c85c07;
+      background-color: #ea7317;
     }
-
-    #result {
-      text-align: left;
+    #results {
       margin-top: 20px;
+    }
+    #error {
+      color: red;
+      margin-top: 10px;
+    }
+    .dark-mode {
+      background-color: #1e1e1e;
+      color: #f5f5f5;
+    }
+    .dark-mode .logo,
+    .dark-mode .iac-logo {
+      filter: brightness(150%);
+    }
+    .dark-mode input,
+    .dark-mode button {
+      background-color: #333;
+      color: #f5f5f5;
+      border: 1px solid #888;
+    }
+    #darkModeToggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #EA7317;
+      color: white;
+      padding: 10px;
+      margin: 5px auto;
+      width: 90%;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-  <!-- Top Logo Row -->
-  <div class="header-logos">
-    <img src="ccpl_logo.png" alt="CCPL Logo" />
-    <img src="gac_foundation_logo.png" alt="GAC Foundation Logo" />
+
+  <div class="header">
+    <img src="ccpl_logo.png" alt="CCPL Logo" class="logo" />
+    <img src="gac_foundation_logo.png" alt="GAC Foundation Logo" class="logo" />
   </div>
 
-  <!-- IAC Logo Centered -->
-  <div class="iac-logo">
-    <img src="iac_Logo.png" alt="IAC Logo" />
-  </div>
+  <img src="iac_Logo.png" alt="IAC Logo" class="iac-logo" />
+  <h1>GPI Student Project Status Checker</h1>
 
-  <!-- Title -->
-  <div class="title">Intern Project Status Checker</div>
+  <input type="text" id="searchInput" placeholder="Enter your Intern ID..." />
+  <button onclick="searchStatus()">Search</button>
 
-  <!-- Main Box -->
-  <div class="container">
-    <!-- Instructions -->
-    <div class="instructions">
-      <h3>Instructions:</h3>
-      <ul>
-        <li>Enter your <strong>Intern ID</strong> (e.g., <code>IP23-000123</code> or <code>IP -0123</code>).</li>
-        <li>You may include or exclude spaces – it will still work.</li>
-        <li>If not found, your record might still be under processing.</li>
-      </ul>
-    </div>
-
-    <!-- Input -->
-    <input type="text" id="internId" placeholder="Enter your Intern ID" />
-    <button onclick="search()">Search</button>
-
-    <!-- Results -->
-    <div id="result"></div>
-  </div>
+  <div id="results"></div>
+  <div id="error"></div>
+  <button id="darkModeToggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
 
   <script>
     let studentData = [];
 
-    // Normalization function: remove spaces, dashes convert to uppercase
-    function normalizeId(str) {
-      return str.replace(/[\s-]+/g, '').toUpperCase();
-    }
-
-    // Load CSV file
-    fetch("students.csv")
-      .then(res => res.text())
-      .then(text => {
-        const lines = text.trim().split(/\r?\n/);
+    fetch("student_data.csv")
+      .then((response) => response.text())
+      .then((csv) => {
+        const lines = csv.trim().split("\n");
         const headers = lines[0].split(",");
-        studentData = lines.slice(1).map(line => {
+        studentData = lines.slice(1).map((line) => {
           const values = line.split(",");
-          let obj = {};
-          headers.forEach((header, i) => {
-            obj[header.trim()] = values[i] ? values[i].trim() : "";
+          let row = {};
+          headers.forEach((h, i) => {
+            row[h.trim()] = values[i]?.trim() || "";
           });
-          return obj;
+          return row;
         });
       });
 
-    // Search logic
-    function search() {
-      const inputId = normalizeId(document.getElementById("internId").value.trim());
-      const resultBox = document.getElementById("result");
+    function normalize(id) {
+      return id.replace(/\s|-/g, "").toLowerCase();
+    }
 
-      if (!inputId) {
-        resultBox.innerHTML = "<span style='color:red;'>Please enter a valid Intern ID.</span>";
+    function searchStatus() {
+      const input = document.getElementById("searchInput").value.trim();
+      const resultsDiv = document.getElementById("results");
+      const errorDiv = document.getElementById("error");
+      resultsDiv.innerHTML = "";
+      errorDiv.textContent = "";
+
+      if (!input) {
+        errorDiv.textContent = "Please enter your Intern ID.";
         return;
       }
 
-      const results = studentData.filter(s => {
-        const rawId = s["Intern ID"] || "";
-        return normalizeId(rawId) === inputId;
-      });
+      const searchId = normalize(input);
+      const matches = studentData.filter((row) => normalize(row["Intern ID"]) === searchId);
 
-      if (results.length > 0) {
-        resultBox.innerHTML = results.map(student => `
-          <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #f9f9f9;">
-            <b>Intern ID:</b> ${student["Intern ID"]}<br>
-            <b>Name:</b> ${student["Name"]}<br>
-            <b>College:</b> ${student["College/ University Name"]}<br>
-            <b>Domain:</b> ${student["Domain Name"]}<br>
-            <b>Verification Status:</b> ${student["Verification Status"]}<br>
-            <b>Final Project Result:</b> ${student["Final Project Checking Result"]}<br>
-            <b>Excellence Award:</b> ${student["Final Excellence Award"]}<br>
-            <b>Comments:</b> ${student["Final Comment"]}<br>
-            <b>Experience Letter Sent:</b> ${student["Experience Letter Sent Date"]}<br>
-          </div>
-        `).join('');
-      } else {
-        resultBox.innerHTML = "<span style='color:red;'>Intern ID not found. Please check again.</span>";
+      if (matches.length === 0) {
+        errorDiv.textContent = "Intern ID not found. Please check again.";
+        return;
       }
+
+      matches.forEach((match) => {
+        let html = "<ul>";
+        for (const key in match) {
+          if (match[key] && key !== "Intern ID") {
+            html += `<li><strong>${key}:</strong> ${match[key]}</li>`;
+          }
+        }
+        html += "</ul><hr/>";
+        resultsDiv.innerHTML += html;
+      });
+    }
+
+    function toggleDarkMode() {
+      const body = document.body;
+      const toggleBtn = document.getElementById("darkModeToggle");
+      const isDark = body.classList.toggle("dark-mode");
+      toggleBtn.innerText = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
     }
   </script>
 </body>
