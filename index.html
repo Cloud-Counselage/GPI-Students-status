@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>INTERN PROJECT STATUS CHECKER</title>
   <style>
     body {
@@ -12,14 +11,11 @@
       padding: 20px;
     }
 
-    /* Logo Section */
     .header-logos {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      gap: 30px;
       margin-bottom: 10px;
-      flex-wrap: wrap;
     }
 
     .header-logos img {
@@ -30,7 +26,7 @@
     .iac-logo {
       display: flex;
       justify-content: center;
-      margin: 10px 0 20px 0;
+      margin: 10px 0 0 0;
     }
 
     .iac-logo img {
@@ -40,9 +36,9 @@
 
     .title {
       text-align: center;
-      font-size: 36px;
+      font-size: 40px;
       font-weight: bold;
-      margin-bottom: 20px;
+      margin: 10px 0 20px 0;
     }
 
     .container {
@@ -51,7 +47,9 @@
       background: #fff;
       padding: 30px;
       border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 1;
     }
 
     .instructions {
@@ -61,7 +59,6 @@
       border-left: 5px solid #007acc;
       margin-bottom: 20px;
       border-radius: 6px;
-      font-size: 15px;
     }
 
     input, button {
@@ -69,58 +66,33 @@
       padding: 12px;
       font-size: 16px;
       margin-top: 10px;
-      box-sizing: border-box;
     }
 
     button {
-      background-color: #ea7317;
+      background-color: #EA7317;
       color: white;
       border: none;
       cursor: pointer;
     }
 
     button:hover {
-      background-color: #c85c07;
+      background-color: #c85c07#c85c07;
     }
 
     #result {
       text-align: left;
       margin-top: 20px;
     }
-
-    @media (max-width: 600px) {
-      .header-logos img,
-      .iac-logo img {
-        width: 70px;
-      }
-
-      .title {
-        font-size: 26px;
-      }
-
-      .container {
-        padding: 20px 15px;
-      }
-
-      .instructions {
-        font-size: 13px;
-      }
-
-      #result div {
-        font-size: 14px;
-      }
-    }
   </style>
 </head>
 <body>
-
-  <!-- Top Logos -->
+  <!-- Top Logo Row -->
   <div class="header-logos">
     <img src="ccpl_logo.png" alt="CCPL Logo" />
     <img src="gac_foundation_logo.png" alt="GAC Foundation Logo" />
   </div>
 
-  <!-- IAC Logo -->
+  <!-- IAC Logo Centered -->
   <div class="iac-logo">
     <img src="iac_Logo.png" alt="IAC Logo" />
   </div>
@@ -128,7 +100,7 @@
   <!-- Title -->
   <div class="title">Intern Project Status Checker</div>
 
-  <!-- Main Container -->
+  <!-- Main Box -->
   <div class="container">
     <!-- Instructions -->
     <div class="instructions">
@@ -140,21 +112,23 @@
       </ul>
     </div>
 
-    <!-- Input Field -->
+    <!-- Input -->
     <input type="text" id="internId" placeholder="Enter your Intern ID" />
     <button onclick="search()">Search</button>
 
-    <!-- Result Box -->
+    <!-- Results -->
     <div id="result"></div>
   </div>
 
   <script>
     let studentData = [];
 
+    // Normalization function: remove spaces, dashes convert to uppercase
     function normalizeId(str) {
-      return str.replace(/[\s-]+/g, "").toUpperCase();
+      return str.replace(/[\s-]+/g, '').toUpperCase();
     }
 
+    // Load CSV file
     fetch("students.csv")
       .then(res => res.text())
       .then(text => {
@@ -170,6 +144,7 @@
         });
       });
 
+    // Search logic
     function search() {
       const inputId = normalizeId(document.getElementById("internId").value.trim());
       const resultBox = document.getElementById("result");
