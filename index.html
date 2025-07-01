@@ -89,7 +89,6 @@
       margin-top: 20px;
     }
 
-    /* Mobile adjustments */
     @media (max-width: 600px) {
       .header-logos {
         flex-direction: column;
@@ -125,23 +124,18 @@
   </style>
 </head>
 <body>
-  <!-- Logos Row -->
   <div class="header-logos">
     <img src="ccpl_logo.png" alt="CCPL Logo" />
     <img src="gac_foundation_logo.png" alt="GAC Foundation Logo" />
   </div>
 
-  <!-- Center Logo -->
   <div class="iac-logo">
     <img src="iac_Logo.png" alt="IAC Logo" />
   </div>
 
-  <!-- Title -->
   <div class="title">Intern Project Status Checker</div>
 
-  <!-- Main Container -->
   <div class="container">
-    <!-- Instructions -->
     <div class="instructions">
       <h3>Instructions:</h3>
       <ul>
@@ -151,11 +145,9 @@
       </ul>
     </div>
 
-    <!-- Search -->
     <input type="text" id="internId" placeholder="Enter your Intern ID" />
     <button onclick="search()">Search</button>
 
-    <!-- Results -->
     <div id="result"></div>
   </div>
 
@@ -186,8 +178,7 @@
       const resultBox = document.getElementById("result");
 
       if (!inputId) {
-        resultBox.innerHTML =
-          "<span style='color:red;'>Please enter a valid Intern ID.</span>";
+        resultBox.innerHTML = "<span style='color:red;'>Please enter a valid Intern ID.</span>";
         return;
       }
 
@@ -198,25 +189,21 @@
 
       if (results.length > 0) {
         resultBox.innerHTML = results
-          .map(
-            (student) => `
-          <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #f9f9f9;">
-            <b>Intern ID:</b> ${student["Intern ID"]}<br>
-            <b>Name:</b> ${student["Name"]}<br>
-            <b>College:</b> ${student["College/ University Name"]}<br>
-            <b>Domain:</b> ${student["Domain Name"]}<br>
-            <b>Verification Status:</b> ${student["Verification Status"]}<br>
-            <b>Final Project Result:</b> ${student["Final Project Checking Result"]}<br>
-            <b>Excellence Award:</b> ${student["Final Excellence Award"]}<br>
-            <b>Comments:</b> ${student["Final Comment"]}<br>
-            <b>Experience Letter Sent:</b> ${student["Experience Letter Sent Date"]}<br>
-          </div>
-        `
-          )
-          .join("");
+          .map((student) => `
+            <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #f9f9f9;">
+              <b>Intern ID:</b> ${student["Intern ID"]}<br>
+              <b>Name:</b> ${student["Name"]}<br>
+              <b>College:</b> ${student["College/ University Name"]}<br>
+              <b>Domain:</b> ${student["Domain Name"]}<br>
+              <b>Verification Status:</b> ${student["Verification Status"]}<br>
+              <b>Final Project Result:</b> ${student["Final Project Checking Result"]}<br>
+              <b>Excellence Award:</b> ${student["Final Excellence Award"]}<br>
+              <b>Comments:</b> ${student["Final Comment"]}<br>
+              <b>Experience Letter Sent:</b> ${student["Experience Letter Sent Date"]}<br>
+            </div>
+          `).join('');
       } else {
-        resultBox.innerHTML =
-          "<span style='color:red;'>Intern ID not found. Please check again.</span>";
+        resultBox.innerHTML = "<span style='color:red;'>Intern ID not found. Please check again.</span>";
       }
     }
   </script>
