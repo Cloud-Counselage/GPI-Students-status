@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INTERN PROJECT STATUS CHECKER</title>
   <style>
     body {
@@ -38,7 +38,7 @@
 
     .title {
       text-align: center;
-      font-size: 32px;
+      font-size: 36px;
       font-weight: bold;
       margin: 10px 0 20px 0;
     }
@@ -49,7 +49,7 @@
       background: #fff;
       padding: 30px;
       border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
       position: relative;
       z-index: 1;
     }
@@ -64,7 +64,8 @@
       font-size: 14px;
     }
 
-    input, button {
+    input,
+    button {
       width: 100%;
       padding: 12px;
       font-size: 16px;
@@ -73,7 +74,7 @@
     }
 
     button {
-      background-color: #EA7317;
+      background-color: #ea7317;
       color: white;
       border: none;
       cursor: pointer;
@@ -88,7 +89,7 @@
       margin-top: 20px;
     }
 
-    /* Responsive layout for small devices */
+    /* Mobile adjustments */
     @media (max-width: 600px) {
       .header-logos {
         flex-direction: column;
@@ -101,19 +102,20 @@
       }
 
       .title {
-        font-size: 24px;
+        font-size: 26px;
       }
 
       .container {
         padding: 20px 15px;
       }
 
-      .instructions {
-        font-size: 13px;
+      input,
+      button {
+        font-size: 15px;
       }
 
-      input, button {
-        font-size: 15px;
+      .instructions {
+        font-size: 13px;
       }
 
       #result div {
@@ -123,14 +125,13 @@
   </style>
 </head>
 <body>
-
-  <!-- Top Logo Row -->
+  <!-- Logos Row -->
   <div class="header-logos">
     <img src="ccpl_logo.png" alt="CCPL Logo" />
     <img src="gac_foundation_logo.png" alt="GAC Foundation Logo" />
   </div>
 
-  <!-- IAC Logo Centered -->
+  <!-- Center Logo -->
   <div class="iac-logo">
     <img src="iac_Logo.png" alt="IAC Logo" />
   </div>
@@ -138,7 +139,7 @@
   <!-- Title -->
   <div class="title">Intern Project Status Checker</div>
 
-  <!-- Main Box -->
+  <!-- Main Container -->
   <div class="container">
     <!-- Instructions -->
     <div class="instructions">
@@ -150,7 +151,7 @@
       </ul>
     </div>
 
-    <!-- Input -->
+    <!-- Search -->
     <input type="text" id="internId" placeholder="Enter your Intern ID" />
     <button onclick="search()">Search</button>
 
@@ -161,18 +162,16 @@
   <script>
     let studentData = [];
 
-    // Normalization function: remove spaces, dashes, convert to uppercase
     function normalizeId(str) {
-      return str.replace(/[\s-]+/g, '').toUpperCase();
+      return str.replace(/[\s-]+/g, "").toUpperCase();
     }
 
-    // Load CSV file
     fetch("students.csv")
-      .then(res => res.text())
-      .then(text => {
-        const lines = text.trim().split(/\\r?\\n/);
+      .then((res) => res.text())
+      .then((text) => {
+        const lines = text.trim().split(/\r?\n/);
         const headers = lines[0].split(",");
-        studentData = lines.slice(1).map(line => {
+        studentData = lines.slice(1).map((line) => {
           const values = line.split(",");
           let obj = {};
           headers.forEach((header, i) => {
@@ -182,23 +181,25 @@
         });
       });
 
-    // Search logic
     function search() {
       const inputId = normalizeId(document.getElementById("internId").value.trim());
       const resultBox = document.getElementById("result");
 
       if (!inputId) {
-        resultBox.innerHTML = "<span style='color:red;'>Please enter a valid Intern ID.</span>";
+        resultBox.innerHTML =
+          "<span style='color:red;'>Please enter a valid Intern ID.</span>";
         return;
       }
 
-      const results = studentData.filter(s => {
+      const results = studentData.filter((s) => {
         const rawId = s["Intern ID"] || "";
         return normalizeId(rawId) === inputId;
       });
 
       if (results.length > 0) {
-        resultBox.innerHTML = results.map(student => `
+        resultBox.innerHTML = results
+          .map(
+            (student) => `
           <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #f9f9f9;">
             <b>Intern ID:</b> ${student["Intern ID"]}<br>
             <b>Name:</b> ${student["Name"]}<br>
@@ -210,9 +211,12 @@
             <b>Comments:</b> ${student["Final Comment"]}<br>
             <b>Experience Letter Sent:</b> ${student["Experience Letter Sent Date"]}<br>
           </div>
-        `).join('');
+        `
+          )
+          .join("");
       } else {
-        resultBox.innerHTML = "<span style='color:red;'>Intern ID not found. Please check again.</span>";
+        resultBox.innerHTML =
+          "<span style='color:red;'>Intern ID not found. Please check again.</span>";
       }
     }
   </script>
