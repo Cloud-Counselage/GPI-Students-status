@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INTERN PROJECT STATUS CHECKER</title>
   <style>
     body {
@@ -15,6 +16,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
       margin-bottom: 10px;
     }
 
@@ -36,7 +38,7 @@
 
     .title {
       text-align: center;
-      font-size: 40px;
+      font-size: 32px;
       font-weight: bold;
       margin: 10px 0 20px 0;
     }
@@ -59,6 +61,7 @@
       border-left: 5px solid #007acc;
       margin-bottom: 20px;
       border-radius: 6px;
+      font-size: 14px;
     }
 
     input, button {
@@ -66,6 +69,7 @@
       padding: 12px;
       font-size: 16px;
       margin-top: 10px;
+      box-sizing: border-box;
     }
 
     button {
@@ -76,16 +80,50 @@
     }
 
     button:hover {
-      background-color: #c85c07#c85c07;
+      background-color: #c85c07;
     }
 
     #result {
       text-align: left;
       margin-top: 20px;
     }
+
+    /* Responsive layout for small devices */
+    @media (max-width: 600px) {
+      .header-logos {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .header-logos img,
+      .iac-logo img {
+        width: 80px;
+      }
+
+      .title {
+        font-size: 24px;
+      }
+
+      .container {
+        padding: 20px 15px;
+      }
+
+      .instructions {
+        font-size: 13px;
+      }
+
+      input, button {
+        font-size: 15px;
+      }
+
+      #result div {
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
+
   <!-- Top Logo Row -->
   <div class="header-logos">
     <img src="ccpl_logo.png" alt="CCPL Logo" />
@@ -123,7 +161,7 @@
   <script>
     let studentData = [];
 
-    // Normalization function: remove spaces, dashes convert to uppercase
+    // Normalization function: remove spaces, dashes, convert to uppercase
     function normalizeId(str) {
       return str.replace(/[\s-]+/g, '').toUpperCase();
     }
@@ -132,7 +170,7 @@
     fetch("students.csv")
       .then(res => res.text())
       .then(text => {
-        const lines = text.trim().split(/\r?\n/);
+        const lines = text.trim().split(/\\r?\\n/);
         const headers = lines[0].split(",");
         studentData = lines.slice(1).map(line => {
           const values = line.split(",");
