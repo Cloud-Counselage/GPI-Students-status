@@ -16,8 +16,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
       margin-bottom: 10px;
+      flex-wrap: nowrap;
+      gap: 10px;
     }
 
     .header-logos img {
@@ -91,13 +92,14 @@
 
     @media (max-width: 600px) {
       .header-logos {
-        flex-direction: column;
-        gap: 10px;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: nowrap;
       }
 
       .header-logos img,
       .iac-logo img {
-        width: 80px;
+        width: 70px;
       }
 
       .title {
@@ -124,18 +126,23 @@
   </style>
 </head>
 <body>
+  <!-- Top Logo Row -->
   <div class="header-logos">
     <img src="ccpl_logo.png" alt="CCPL Logo" />
     <img src="gac_foundation_logo.png" alt="GAC Foundation Logo" />
   </div>
 
+  <!-- IAC Logo Centered -->
   <div class="iac-logo">
     <img src="iac_Logo.png" alt="IAC Logo" />
   </div>
 
+  <!-- Title -->
   <div class="title">Intern Project Status Checker</div>
 
+  <!-- Main Box -->
   <div class="container">
+    <!-- Instructions -->
     <div class="instructions">
       <h3>Instructions:</h3>
       <ul>
@@ -145,9 +152,11 @@
       </ul>
     </div>
 
+    <!-- Input -->
     <input type="text" id="internId" placeholder="Enter your Intern ID" />
     <button onclick="search()">Search</button>
 
+    <!-- Results -->
     <div id="result"></div>
   </div>
 
