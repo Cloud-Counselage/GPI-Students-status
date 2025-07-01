@@ -12,27 +12,27 @@
       padding: 20px;
     }
 
-    .header-logos {
+    .header-container {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      margin-bottom: 10px;
-      flex-wrap: nowrap;
-      gap: 10px;
+      margin-bottom: 15px;
     }
 
-    .header-logos img {
+    .top-logos {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .top-logos img {
       width: 100px;
       height: auto;
     }
 
-    .iac-logo {
-      display: flex;
-      justify-content: center;
-      margin: 10px 0 0 0;
-    }
-
     .iac-logo img {
+      margin-top: 10px;
       width: 120px;
       height: auto;
     }
@@ -41,7 +41,7 @@
       text-align: center;
       font-size: 36px;
       font-weight: bold;
-      margin: 10px 0 20px 0;
+      margin: 15px 0 20px 0;
     }
 
     .container {
@@ -91,13 +91,7 @@
     }
 
     @media (max-width: 600px) {
-      .header-logos {
-        justify-content: center;
-        gap: 20px;
-        flex-wrap: nowrap;
-      }
-
-      .header-logos img,
+      .top-logos img,
       .iac-logo img {
         width: 70px;
       }
@@ -126,15 +120,16 @@
   </style>
 </head>
 <body>
-  <!-- Top Logo Row -->
-  <div class="header-logos">
-    <img src="ccpl_logo.png" alt="CCPL Logo" />
-    <img src="gac_foundation_logo.png" alt="GAC Foundation Logo" />
-  </div>
 
-  <!-- IAC Logo Centered -->
-  <div class="iac-logo">
-    <img src="iac_Logo.png" alt="IAC Logo" />
+  <!-- Logos Section -->
+  <div class="header-container">
+    <div class="top-logos">
+      <img src="ccpl_logo.png" alt="CCPL Logo" />
+      <img src="gac_foundation_logo.png" alt="GAC Foundation Logo" />
+    </div>
+    <div class="iac-logo">
+      <img src="iac_Logo.png" alt="IAC Logo" />
+    </div>
   </div>
 
   <!-- Title -->
