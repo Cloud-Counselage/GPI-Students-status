@@ -92,14 +92,12 @@
     <div class="instructions">
       <h3>Instructions:</h3>
       <ul>
-        <li>Enter your <strong>Intern ID</strong> (e.g., <code>IP23-000123</code> or <code>IP -0123</code>).</li>
-        <li>You may include or exclude spaces – it will still work.</li>
         <li>If not found, your record might still be under processing.</li>
         <li>Data is updated once a month so the recently submitted may not get immediate updates.</li>
       </ul>
     </div>
 
-    <input id="internId" placeholder="Enter your Intern ID (e.g. IP23-000123)" />
+    <input id="internId" placeholder="Enter your Intern ID (e.g. IP23-000123 or IP -00001)" />
     <button class="searchBtn" id="searchBtn">Search</button>
 
     <div id="result"></div>
@@ -147,7 +145,7 @@ function parseGvizText(text) {
 }
 async function fetchSheetData() {
   try {
-    showLoading("Loading data from Google Sheets...");
+    showLoading("Loading data...");
     const url = buildVizUrl();
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
