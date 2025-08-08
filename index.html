@@ -116,7 +116,7 @@
     const sheetId = "1D7KyabOpUeTEDrP3rqTxWbBvEJmABI97";
  
     // 2. This creates the special export URL.
-    const dataUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=xlsx`;
+    const dataUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=xlsx&cacheBust=${new Date().getTime()}`;
  
     // 3. The fetch call uses this new URL to get the data as an Excel file.
     fetch(dataUrl)
