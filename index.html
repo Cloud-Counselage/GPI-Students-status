@@ -1,135 +1,324 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPI Student Project Status</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f6fa;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #004aad;
-            color: white;
-            text-align: center;
-            padding: 1rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            font-size: 1rem;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            background-color: white;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #004aad;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .no-results {
-            text-align: center;
-            padding: 10px;
-            color: red;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Intern Project Status Checker</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #fff7f1;
+    margin: 0;
+    padding: 20px;
+    color: #222;
+  }
+  .header-logos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .header-logos img { width: 100px; height: auto; }
+  .iac-logo { display:flex; justify-content:center; margin: 10px 0 0 0; }
+  .iac-logo img { width: 120px; height: auto; }
+  .title {
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+    margin: 10px 0 20px 0;
+  }
+  .container {
+    max-width: 760px;
+    margin: auto;
+    background: #fff;
+    padding: 24px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.08);
+  }
+  .instructions {
+    text-align: left;
+    background: #e9f5ff;
+    padding: 12px;
+    border-left: 5px solid #007acc;
+    margin-bottom: 16px;
+    border-radius: 6px;
+  }
+  #internId {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-top: 6px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  button.searchBtn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background-color: #EA7317;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 16px;
+  }
+  button.searchBtn:hover { background-color: #c85c07; }
+  #result { margin-top: 18px; text-align: left; }
+  .card {
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fbfbfb;
+  }
+  .no-result { color: #b00020; font-weight: 600; text-align:center; padding:10px; }
+  .loading { color:#ff9800; text-align:center; padding:10px; }
+  @media (max-width:600px) {
+    .title { font-size: 28px; }
+    .header-logos img { width: 80px; }
+  }
+</style>
 </head>
 <body>
+  <div class="header-logos">
+    <img src="ccpl_logo.png" alt="CCPL Logo">
+    <img src="gac_foundation_logo.png" alt="GAC Foundation Logo">
+  </div>
+  <div class="iac-logo"><img src="iac_Logo.png" alt="IAC Logo"></div>
+  <div class="title">Intern Project Status Checker</div>
 
-<header>GPI Student Project Status</header>
+  <div class="container">
+    <div class="instructions">
+      <h3>Instructions:</h3>
+      <ul>
+        <li>Enter your <strong>Intern ID</strong> (e.g., <code>IP23-000123</code> or <code>IP -0123</code>).</li>
+        <li>You may include or exclude spaces – it will still work.</li>
+        <li>If not found, your record might still be under processing.</li>
+        <li>Data is updated once a month so the recently submitted may not get immediate updates.</li>
+      </ul>
+    </div>
 
-<div class="container">
-    <input type="text" id="searchBox" placeholder="Enter Intern ID to search...">
-    <div id="results"></div>
-</div>
+    <input id="internId" placeholder="Enter your Intern ID (e.g. IP23-000123)" />
+    <button class="searchBtn" id="searchBtn">Search</button>
+
+    <div id="result"></div>
+  </div>
 
 <script>
-    const sheetID = "YOUR_SHEET_ID"; // Replace with Sheet B's ID
-    const sheetName = "Sheet1"; // Change if your sheet has a different name
-    const baseURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=${sheetName}`;
+/* ---------------- CONFIG ---------------- */
+const SHEET_ID = "YOUR_SHEET_ID_HERE"; // <<-- replace this with Sheet B's ID
+const SHEET_NAME = "Sheet1";           // <<-- change to your tab name if different
+/* ---------------------------------------- */
 
-    let studentData = [];
+const resultDiv = document.getElementById('result');
+const inputEl = document.getElementById('internId');
+const searchBtn = document.getElementById('searchBtn');
 
-    // Fetch and parse Google Sheet JSON
-    async function fetchData() {
-        try {
-            const res = await fetch(baseURL);
-            const text = await res.text();
+let studentData = [];   // array of objects { "Intern ID": "...", "Name": "...", ... }
+let headerKeys = [];    // actual column names from sheet
+let normalizedHeaderMap = {}; // maps normalized header -> actual header
 
-            // Remove Google visualization JSON padding
-            const json = JSON.parse(text.substr(47).slice(0, -2));
+function showLoading(msg = "Loading data...") {
+  resultDiv.innerHTML = `<div class="loading">${msg}</div>`;
+}
+function showError(msg) {
+  resultDiv.innerHTML = `<div class="no-result">${msg}</div>`;
+}
+function clearResult() { resultDiv.innerHTML = ""; }
 
-            // Extract rows into JS objects
-            studentData = json.table.rows.map(row => row.c.map(cell => cell ? cell.v : ""));
+/* Normalize input like IP-123 or IP 123 -> IP123 */
+function normalizeId(str) {
+  if (str === null || str === undefined) return "";
+  return String(str).replace(/[\s\-]+/g, '').toUpperCase();
+}
 
-        } catch (err) {
-            console.error("Error fetching data:", err);
-        }
-    }
+/* Normalize header names to a canonical key (remove spaces, punctuation, lowercase) */
+function normalizeKey(s) {
+  if (!s) return "";
+  return String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+}
 
-    // Search by Intern ID
-    function searchStudent() {
-        const searchValue = document.getElementById("searchBox").value.trim().toLowerCase();
-        const resultsDiv = document.getElementById("results");
-        resultsDiv.innerHTML = "";
+/* Build the visualization API URL (with cacheBust param for safety) */
+function buildVizUrl() {
+  const base = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq`;
+  const params = `?sheet=${encodeURIComponent(SHEET_NAME)}&tqx=out:json&cacheBust=${Date.now()}`;
+  return base + params;
+}
 
-        if (searchValue === "") return;
+/* Robust JSON parsing for Google visualization wrapper */
+function parseGvizText(text) {
+  const first = text.indexOf('{');
+  const last = text.lastIndexOf('}');
+  if (first === -1 || last === -1) throw new Error("Unexpected sheet response format");
+  const jsonText = text.substring(first, last + 1);
+  return JSON.parse(jsonText);
+}
 
-        const filtered = studentData.filter(row => row[0].toString().toLowerCase() === searchValue);
+/* Fetch sheet, parse headers, and populate studentData[] as objects */
+async function fetchSheetData() {
+  try {
+    showLoading("Loading data from Google Sheets...");
+    const url = buildVizUrl();
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const parsed = parseGvizText(text);
 
-        if (filtered.length === 0) {
-            resultsDiv.innerHTML = `<div class="no-results">No record found</div>`;
-            return;
-        }
-
-        let tableHTML = "<table><thead><tr>";
-        jsonHeaders().forEach(header => tableHTML += `<th>${header}</th>`);
-        tableHTML += "</tr></thead><tbody>";
-
-        filtered.forEach(row => {
-            tableHTML += "<tr>";
-            row.forEach(cell => tableHTML += `<td>${cell}</td>`);
-            tableHTML += "</tr>";
-        });
-
-        tableHTML += "</tbody></table>";
-        resultsDiv.innerHTML = tableHTML;
-    }
-
-    // Extract headers from first row of sheet
-    function jsonHeaders() {
-        // First row in your sheet should contain column names
-        return studentData.length > 0 ? studentData[0] : [];
-    }
-
-    // Load data and add event listener
-    fetchData().then(() => {
-        document.getElementById("searchBox").addEventListener("input", searchStudent);
+    // column headers (labels)
+    headerKeys = (parsed.table.cols || []).map((c, i) => {
+      // prefer label; if label empty try 'ColumnX'
+      return (c && c.label) ? String(c.label).trim() : `Column${i+1}`;
     });
-</script>
 
+    // build normalizedHeaderMap for flexible matching
+    normalizedHeaderMap = {};
+    headerKeys.forEach(h => normalizedHeaderMap[normalizeKey(h)] = h);
+
+    // map rows to objects using headerKeys (json.table.rows)
+    const rows = parsed.table.rows || [];
+    studentData = rows.map(r => {
+      const obj = {};
+      for (let i = 0; i < headerKeys.length; i++) {
+        const cell = (r.c && r.c[i]) ? r.c[i].v : "";
+        obj[headerKeys[i]] = (cell === null || cell === undefined) ? "" : String(cell);
+      }
+      return obj;
+    });
+
+    // If there are no rows, let user know
+    if (!studentData.length) {
+      showError("Sheet loaded but contains no rows. Check Sheet B for data.");
+      return;
+    }
+
+    clearResult();
+    console.log("Sheet headers:", headerKeys);
+    console.log("Loaded rows:", studentData.length);
+  } catch (err) {
+    console.error("Error fetching/parsing sheet:", err);
+    showError("Error loading student data. Check sheet sharing (Anyone with the link - Viewer) and Sheet ID.");
+  }
+}
+
+/* Find the actual header name for a "friendly" label
+   e.g. findHeader("Intern ID") => might return "Intern ID" or "intern id" or "InternID" that exists in sheet */
+function findHeader(friendly) {
+  const target = normalizeKey(friendly);
+  // exact match or includes
+  if (normalizedHeaderMap[target]) return normalizedHeaderMap[target];
+  // fallback: find header that contains all tokens
+  const tokens = target.split(/(?=[A-Z])|_/).filter(Boolean); // not strictly necessary
+  for (const key in normalizedHeaderMap) {
+    if (key.includes(target) || target.includes(key)) return normalizedHeaderMap[key];
+  }
+  // final fallback: try partial contains
+  for (const key in normalizedHeaderMap) {
+    if (key.indexOf(target) !== -1) return normalizedHeaderMap[key];
+  }
+  // nothing found
+  return null;
+}
+
+/* Build the display HTML for a student object.
+   Use friendlyLabels array to pick common fields (works even if column names vary slightly). */
+function renderStudentCard(student) {
+  const friendlyLabels = [
+    "Intern ID",
+    "Name",
+    "College/ University Name",
+    "Domain Name",
+    "Verification Status",
+    "Final Project Checking Result",
+    "Final Excellence Award",
+    "Final Comment",
+    "Experience Letter Sent Date"
+  ];
+
+  // For each friendly label try to find matching header in the sheet
+  let html = '<div class="card">';
+  friendlyLabels.forEach(label => {
+    const header = findHeader(label);
+    if (header && (student[header] !== undefined && student[header] !== null && String(student[header]).trim() !== "")) {
+      html += `<div><b>${label}:</b> ${escapeHtml(student[header])}</div>`;
+    }
+  });
+
+  // If nothing matched, fall back to printing all columns
+  if (html === '<div class="card">') {
+    html += '<div><b>No standard fields found — full row:</b></div>';
+    for (const key of headerKeys) {
+      html += `<div><b>${escapeHtml(key)}:</b> ${escapeHtml(student[key]||"")}</div>`;
+    }
+  }
+  html += '</div>';
+  return html;
+}
+
+/* Basic HTML escape */
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#039;');
+}
+
+/* Main search handler */
+function doSearch() {
+  const raw = inputEl.value.trim();
+  const q = normalizeId(raw);
+  if (!q) {
+    resultDiv.innerHTML = '<div class="no-result">Please enter an Intern ID.</div>';
+    return;
+  }
+  if (!studentData || !studentData.length) {
+    resultDiv.innerHTML = '<div class="loading">Data not yet loaded — please wait a moment and try again.</div>';
+    return;
+  }
+
+  // Identify which header is Intern ID in sheet
+  const internHeaderCandidates = ["Intern ID","InternID","InternId","internid","id","registrationid","regid"];
+  let internHeader = null;
+  for (const c of internHeaderCandidates) {
+    const h = findHeader(c);
+    if (h) { internHeader = h; break; }
+  }
+  // fallback: try to auto-detect any header containing 'intern' and 'id'
+  if (!internHeader) {
+    for (const key of Object.keys(normalizedHeaderMap)) {
+      if (key.includes('intern') && (key.includes('id') || key.includes('no') || key.includes('number'))) {
+        internHeader = normalizedHeaderMap[key];
+        break;
+      }
+    }
+  }
+
+  if (!internHeader) {
+    // if we still can't detect, check first column as fallback
+    internHeader = headerKeys[0];
+    console.warn("Could not detect Intern ID header automatically — using first column as fallback:", internHeader);
+  }
+
+  const matches = studentData.filter(row => normalizeId(row[internHeader]) === q);
+
+  if (!matches.length) {
+    resultDiv.innerHTML = `<div class="no-result">Intern ID not found. Please check your ID and try again.</div>`;
+    return;
+  }
+
+  // Build HTML for all matches
+  const out = matches.map(renderStudentCard).join('');
+  resultDiv.innerHTML = out;
+}
+
+/* Hook up events */
+searchBtn.addEventListener('click', () => doSearch());
+inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
+
+/* Initial load */
+fetchSheetData();
+</script>
 </body>
 </html>
