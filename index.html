@@ -158,7 +158,7 @@ function parseGvizText(text) {
 /* Fetch sheet, parse headers, and populate studentData[] as objects */
 async function fetchSheetData() {
   try {
-    showLoading("Loading data from Google Sheets...");
+    showLoading("Loading data...");
     const url = buildVizUrl();
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
