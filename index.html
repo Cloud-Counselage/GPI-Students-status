@@ -227,13 +227,6 @@ function renderStudentCard(student) {
     }
   });
 
-  // Always show Experience Letter Sent Date
-  const expHeader = findHeader("Experience Letter Sent Date");
-  let expValue = "undefined";
-  if (expHeader && student[expHeader] !== undefined && student[expHeader] !== null && String(student[expHeader]).trim() !== "") {
-    expValue = formatDate(student[expHeader]);
-  }
-  html += `<div><b>Experience Letter Sent Date:</b> ${escapeHtml(expValue)}</div>`;
 
   html += '</div>';
   return html;
