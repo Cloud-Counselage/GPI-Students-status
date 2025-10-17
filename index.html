@@ -169,7 +169,7 @@ function parseGvizText(text) {
 }
 async function fetchSheetData() {
   try {
-    showLoading("Getting data from Google Sheet...");
+    showLoading("updating records...");
     const url = buildVizUrl();
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
