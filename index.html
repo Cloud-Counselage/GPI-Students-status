@@ -12,21 +12,32 @@
     padding: 20px;
     color: #222;
   }
+
+  /* ---------- Header Logo Section ---------- */
   .header-logos {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 25px;
+    gap: 10px;
+    flex-wrap: wrap;
   }
-  .header-logos img { width: 100px; height: auto; }
-  .iac-logo { display:flex; justify-content:center; margin: 10px 0 0 0; }
-  .iac-logo img { width: 120px; height: auto; }
+  .header-logos img {
+    height: 90px;
+    width: auto;
+  }
+  .header-logos .iac-center {
+    height: 100px; /* slightly larger for balance */
+    align-self: center;
+  }
+
   .title {
     text-align: center;
     font-size: 40px;
     font-weight: bold;
     margin: 10px 0 20px 0;
   }
+
   .container {
     max-width: 760px;
     margin: auto;
@@ -35,6 +46,7 @@
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0,0,0,0.08);
   }
+
   .instructions {
     text-align: left;
     background: #e9f5ff;
@@ -43,6 +55,7 @@
     margin-bottom: 16px;
     border-radius: 6px;
   }
+
   #internId {
     width: 100%;
     padding: 12px;
@@ -52,6 +65,7 @@
     border-radius: 6px;
     border: 1px solid #ccc;
   }
+
   button.searchBtn {
     width: 100%;
     padding: 12px;
@@ -64,6 +78,7 @@
     font-size: 16px;
   }
   button.searchBtn:hover { background-color: #c85c07; }
+
   #result { margin-top: 18px; text-align: left; }
   .card {
     margin-bottom: 12px;
@@ -74,18 +89,25 @@
   }
   .no-result { color: #b00020; font-weight: 600; text-align:center; padding:10px; }
   .loading { color:#ff9800; text-align:center; padding:10px; }
+
   @media (max-width:600px) {
     .title { font-size: 28px; }
-    .header-logos img { width: 80px; }
+    .header-logos {
+      flex-direction: column;
+      align-items: center;
+    }
+    .header-logos img { height: 70px; }
   }
 </style>
 </head>
 <body>
+  <!-- ✅ Three Logos in One Horizontal Line -->
   <div class="header-logos">
     <img src="ccpl_logo.png" alt="CCPL Logo">
+    <img src="iac_Logo.png" alt="IAC Logo" class="iac-center">
     <img src="gac_foundation_logo.png" alt="GAC Foundation Logo">
   </div>
-  <div class="iac-logo"><img src="iac_Logo.png" alt="IAC Logo"></div>
+
   <div class="title">Intern Project Status Checker</div>
 
   <div class="container">
@@ -93,9 +115,9 @@
       <h3>Instructions:</h3>
       <ul>
         <li><b>Record Not Found:</b> If your record isn’t found after submission, please wait for some time.</li>
-    <li><b>Recent Submissions:</b> If you submitted your project within the last month, it is still being processed. You will receive an email about your project status.</li>
-    <li><b>Check Your Email:</b> If you don’t see any email from <a href="mailto:member@industryacademiacommunity.com"><b>member@industryacademiacommunity.com</b></a>, please check your spam/junk folder. If it’s still not found, email us and we will resend it.</li>
-    <li><b>🔗 Submission Link:</b> <a href="https://tinyurl.com/mwtwa7uw" target="_blank">https://tinyurl.com/mwtwa7uw</a></li>
+        <li><b>Recent Submissions:</b> If you submitted your project within the last month, it is still being processed. You will receive an email about your project status.</li>
+        <li><b>Check Your Email:</b> If you don’t see any email from <a href="mailto:member@industryacademiacommunity.com"><b>member@industryacademiacommunity.com</b></a>, please check your spam/junk folder. If it’s still not found, email us and we will resend it.</li>
+        <li><b>🔗 Submission Link:</b> <a href="https://tinyurl.com/mwtwa7uw" target="_blank">https://tinyurl.com/mwtwa7uw</a></li>
       </ul>
     </div>
 
@@ -147,7 +169,7 @@ function parseGvizText(text) {
 }
 async function fetchSheetData() {
   try {
-    showLoading("Loading data...");
+    showLoading("Getting data from Google Sheet...");
     const url = buildVizUrl();
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -189,24 +211,6 @@ function findHeader(friendly) {
   }
   return null;
 }
-function formatDate(value) {
-  if (!value) return "undefined";
-  try {
-    let dateObj;
-    if (typeof value === "string" && value.startsWith("Date(")) {
-      const parts = value.match(/\d+/g).map(Number);
-      dateObj = new Date(parts[0], parts[1], parts[2]);
-    } else if (typeof value === "number") {
-      dateObj = new Date(Math.round((value - 25569) * 86400 * 1000));
-    } else {
-      dateObj = new Date(value);
-    }
-    if (isNaN(dateObj.getTime())) return "undefined";
-    return dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  } catch {
-    return "undefined";
-  }
-}
 function renderStudentCard(student) {
   const friendlyLabels = [
     "Intern ID",
@@ -226,8 +230,6 @@ function renderStudentCard(student) {
       html += `<div><b>${label}:</b> ${escapeHtml(student[header])}</div>`;
     }
   });
-
-
   html += '</div>';
   return html;
 }
